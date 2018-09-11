@@ -17,14 +17,10 @@ public class Puzzle {
     int blank [] = {0,0};
 
     /*
-    CONSTRUCTORS
-     */
-
-    /*
     HELPER METHODS
      */
 
-    //Print the state of the puzzle
+    // Print the state of the puzzle
     public void printState (){
 
         String print = "";
@@ -44,7 +40,7 @@ public class Puzzle {
         }
     }
 
-    //Set the state of the puzzle
+    // Set the state of the puzzle
     public void setState(String s)
     {
         int k = 0;
@@ -63,7 +59,7 @@ public class Puzzle {
         }
     }
 
-    //Move the blank piece around
+    // Move the blank piece around
     public void move(String s){
         if (s == "up" && blank[0] != 0){
             //swap the tiles
@@ -106,6 +102,41 @@ public class Puzzle {
         }
     }
 
+    // Make n random moves from the goal state
+    public void randomizeState(int n){
+
+        //first set to goal state
+        setState("b12345678");
+        Random rand = new Random();
+
+        //randomize the state of the puzzle
+        for (int i = 0; i < n; i++){
+            //create a new random variable at each iteration
+            int number = rand.nextInt(4) + 1;
+            System.out.println("Random number at this iteration: " + number);
+
+            if (number == 1){
+                System.out.println("Moving blank tile up.");
+                move("up");
+            } else if (number == 2){
+                move("down");
+                System.out.println("Moving blank tile down.");
+            } else if (number == 3){
+                move ("left");
+                System.out.println("Moving blank tile left.");
+            } else if (number == 4){
+                move ("right");
+                System.out.println("Moving blank tile right.");
+            }
+            printState();
+            System.out.println("---------------------");
+        }
+    }
+
+    /*
+    SEARCH
+     */
+
     /*
     MAIN METHOD
      */
@@ -115,20 +146,7 @@ public class Puzzle {
         System.out.println("Welcome to Anna's Project!");
         System.out.println();
 
-        puzzle.setState("b12345678");
-        puzzle.printState();
-
-        puzzle.move("right");
-        puzzle.printState();
-
-        puzzle.move("left");
-        puzzle.printState();
-
-        puzzle.move("down");
-        puzzle.printState();
-
-        puzzle.move("up");
-        puzzle.printState();
+        puzzle.randomizeState(20);
 
         /*
         BufferedReader br = new BufferedReader(
