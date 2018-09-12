@@ -43,18 +43,31 @@ public class Puzzle {
     // Set the state of the puzzle
     public void setState(String s)
     {
-        int k = 0;
+        int i = 0;
+        int j = 0;
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (s.charAt(k) == ('b')) {
-                    currentState[i][j] = 0;
-                    blank[0] = i;
-                    blank[1] = j;
+        for (int k = 0; k < s.length(); k++){
+            if (s.charAt(k) == 'b'){
+                currentState [i][j] = 0;
+                blank[0] = i;
+                blank[1] = j;
+
+                if (j > 1) {
+                    j = 0;
+                    i++;
                 } else {
-                    currentState[i][j] = s.charAt(k) - '0';
+                    j++;
                 }
-                k++;
+
+            } else if (Character.isDigit(s.charAt(k))){
+                currentState[i][j] = s.charAt(k) - '0';
+
+                if (j > 1) {
+                    j = 0;
+                    i++;
+                } else {
+                    j++;
+                }
             }
         }
     }
@@ -137,6 +150,27 @@ public class Puzzle {
     SEARCH
      */
 
+    //calculating h1 heuristic
+    public int calculateH1(){
+
+        int misplacedTiles = 0;
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (currentState[i][j] != goalState[i][j])
+                    misplacedTiles++;
+            }
+        }
+
+        System.out.println("Misplaced tiles: " + misplacedTiles);
+        return misplacedTiles;
+    }
+
+    //calculating h2 heuristic
+    public int calculateH2(){
+        return 0;
+    }
+
     /*
     MAIN METHOD
      */
@@ -146,7 +180,9 @@ public class Puzzle {
         System.out.println("Welcome to Anna's Project!");
         System.out.println();
 
-        puzzle.randomizeState(20);
+        puzzle.setState("b12345678");
+        puzzle.printState();
+        puzzle.calculateH1();
 
         /*
         BufferedReader br = new BufferedReader(
