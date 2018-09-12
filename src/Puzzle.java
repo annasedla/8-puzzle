@@ -8,13 +8,13 @@ public class Puzzle {
      */
 
     //goal state
-    int goalState [][]= {{0,1,2}, {3,4,5}, {6,7,8}};
+    private int goalState [][]= {{0,1,2}, {3,4,5}, {6,7,8}};
 
     //current state
-    int currentState [][] = {{0,1,2}, {3,4,5}, {6,7,8}};
+    private int currentState [][] = {{0,1,2}, {3,4,5}, {6,7,8}};
 
     //position of blank
-    int blank [] = {0,0};
+    private int blank [] = {0,0};
 
     /*
     HELPER METHODS
