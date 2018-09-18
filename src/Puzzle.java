@@ -150,7 +150,7 @@ public class Puzzle {
     SEARCH
      */
 
-    //calculating h1 heuristic
+    //calculating h1 heuristic (misplaced tiles)
     public int calculateH1(){
 
         int misplacedTiles = 0;
@@ -158,7 +158,11 @@ public class Puzzle {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (currentState[i][j] != goalState[i][j])
-                    misplacedTiles++;
+                    if (currentState[i][j] == 0) {
+                        //do nothing since blank is not a tile
+                    } else {
+                        misplacedTiles++;
+                }
             }
         }
 
@@ -166,9 +170,41 @@ public class Puzzle {
         return misplacedTiles;
     }
 
-    //calculating h2 heuristic
+    //calculating h2 heuristic (manhattan distances)
     public int calculateH2(){
-        return 0;
+
+        //manhatttan distance between all the tiles
+        int distance = 0;
+        int a = 0;
+        int b = 0;
+
+        //oof triple loop but constant time so its okay
+        for (int k = 0; k < 9; k++){
+            for (int i = 0; i < 3; i++){
+                for (int j = 0; j < 3; j++){
+                    if (currentState[i][j] == k && k != 0){
+
+                        distance += Math.abs(i - b);
+                        distance += Math.abs(j - a);
+                        if (a > 1) {
+                            a = 0;
+                            b ++;
+                        } else {
+                            a ++;
+                        }
+                    } else if (currentState[i][j] == k && k == 0){
+                        if (a > 1) {
+                            a = 0;
+                            b ++;
+                        } else {
+                            a ++;
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println("Sum of all Manhattan distances: " + distance);
+        return distance;
     }
 
     /*
@@ -180,9 +216,10 @@ public class Puzzle {
         System.out.println("Welcome to Anna's Project!");
         System.out.println();
 
-        puzzle.setState("b12345678");
+        puzzle.setState("1b2345678");
         puzzle.printState();
         puzzle.calculateH1();
+        puzzle.calculateH2();
 
         /*
         BufferedReader br = new BufferedReader(
