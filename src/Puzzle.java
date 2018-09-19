@@ -1,5 +1,4 @@
 import java.util.*;
-import java.io.*;
 
 public class Puzzle {
 
@@ -14,14 +13,14 @@ public class Puzzle {
     private int currentState [][] = {{0,1,2}, {3,4,5}, {6,7,8}};
 
     //position of blank
-    private int blank [] = {0,0};
+    private int currentBlank [] = new int [2];
 
     /*
     HELPER METHODS
      */
 
     // Print the state of the puzzle
-    public void printState (){
+    public void printCurrentState (){
 
         String print = "";
         System.out.println("The state of the puzzle is:");
@@ -40,6 +39,26 @@ public class Puzzle {
         }
     }
 
+    // Print the state of the puzzle
+    public void printState (int [][] state){
+
+        String print = "";
+        System.out.println("The state of the puzzle is:");
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (state[i][j] == 0)
+                    print += "b";
+                else
+                    print += state [i][j];
+                print += " ";
+            }
+            System.out.println(print);
+            print = "";
+
+        }
+    }
+
     // Set the state of the puzzle
     public void setState(String s)
     {
@@ -49,8 +68,8 @@ public class Puzzle {
         for (int k = 0; k < s.length(); k++){
             if (s.charAt(k) == 'b'){
                 currentState [i][j] = 0;
-                blank[0] = i;
-                blank[1] = j;
+                currentBlank[0] = i;
+                currentBlank[1] = j;
 
                 if (j > 1) {
                     j = 0;
@@ -73,50 +92,71 @@ public class Puzzle {
     }
 
     // Move the blank piece around
-    public void move(String s){
-        if (s == "up" && blank[0] != 0){
+    public int[][] move(String direction, int[][] state){
+        int blank[] = new int[2];
+
+        //locate the blank tile for the inputted state
+        for (int i = 0; i < 3; i++){
+            for (int j = 0; j < 3; j++) {
+                if (state[i][j] == 0){
+                    blank[0] = i;
+                    blank[1] = j;
+                }
+            }
+        }
+        if (direction == "up" && blank[0] != 0){
             //swap the tiles
-            int x = currentState[blank[0]-1][blank[1]];
-            currentState[blank[0]-1][blank[1]] = 0;
-            currentState[blank[0]][blank[1]] = x;
+            int x = state[blank[0]-1][blank[1]];
+            state[blank[0]-1][blank[1]] = 0;
+            state[blank[0]][blank[1]] = x;
 
             //overwrite location of blank tile
             blank [0] = blank[0] - 1;
 
-        } else if (s == "down" && blank[0] != 2 ){
+            return state;
+
+        } else if (direction == "down" && blank[0] != 2 ){
             //swap the tiles
-            int x = currentState[blank[0]+1][blank[1]];
-            currentState[blank[0]+1][blank[1]] = 0;
-            currentState[blank[0]][blank[1]] = x;
+            int x = state[blank[0]+1][blank[1]];
+            state[blank[0]+1][blank[1]] = 0;
+            state[blank[0]][blank[1]] = x;
 
             //overwrite location of blank tile
             blank [0] = blank[0] + 1;
 
-        } else if (s == "left" && blank[1] != 0){
+            return state;
+
+        } else if (direction == "left" && blank[1] != 0){
             //swap the tiles
-            int x = currentState[blank[0]][blank[1]-1];
-            currentState[blank[0]][blank[1] - 1] = 0;
-            currentState[blank[0]][blank[1]] = x;
+            int x = state[blank[0]][blank[1]-1];
+            state[blank[0]][blank[1] - 1] = 0;
+            state[blank[0]][blank[1]] = x;
 
             //overwrite location of blank tile
             blank [1] = blank[1] - 1;
 
-        } else if (s =="right" && blank[1] != 2){
+            return state;
+
+        } else if (direction =="right" && blank[1] != 2){
             //swap the tiles
-            int x = currentState[blank[0]][blank[1]+1];
-            currentState[blank[0]][blank[1] + 1] = 0;
-            currentState[blank[0]][blank[1]] = x;
+            int x = state[blank[0]][blank[1]+1];
+            state[blank[0]][blank[1] + 1] = 0;
+            state[blank[0]][blank[1]] = x;
 
             //overwrite location of blank tile
             blank [1] = blank[1] + 1;
 
+            return state;
+
         } else {
-            System.out.println("Not a valid move, please try again.");
+
+            //return the same without changing it??
+            return state;
         }
     }
 
     // Make n random moves from the goal state
-    public void randomizeState(int n){
+    public void randomizeState(int n, int[][] state){
 
         //first set to goal state
         setState("b12345678");
@@ -130,18 +170,18 @@ public class Puzzle {
 
             if (number == 1){
                 System.out.println("Moving blank tile up.");
-                move("up");
+                move("up", state);
             } else if (number == 2){
-                move("down");
+                move("down", state);
                 System.out.println("Moving blank tile down.");
             } else if (number == 3){
-                move ("left");
+                move ("left", state);
                 System.out.println("Moving blank tile left.");
             } else if (number == 4){
-                move ("right");
+                move ("right", state);
                 System.out.println("Moving blank tile right.");
             }
-            printState();
+            printCurrentState();
             System.out.println("---------------------");
         }
     }
@@ -207,6 +247,48 @@ public class Puzzle {
         return distance;
     }
 
+    //Helper class for node
+    private class Node{
+        private int [][] state;
+        private Node previous;
+        private String move;
+        private int pathCost;
+
+        private Node(int [][] state, Node previous, String move, int pathCost){
+            this.state = state;
+            this.previous = previous;
+            this.move = move;
+            this.pathCost = pathCost;
+        }
+    }
+
+    /*
+    PRIORITY QUEUE
+     */
+    private PriorityQueue<Node> priorityQueue = new PriorityQueue<Node>();
+
+    //using A * to solve the puzzle
+    //add current state onto priority queue
+    //create four children with four moves and add them onto priority queue
+    //pop the smallest one
+    //repeat until goal state
+    public void aStar(){
+
+        //stores number of moves in the algorithm
+        int numberOfMoves = 0;
+
+        //create a parent node from the current state
+        Node parent =  new Node (currentState, null, "", 0);
+
+        //add current state onto priority queue
+        priorityQueue.add(parent);
+
+        while (currentState != goalState){
+            //search through the states by moving the tile up, down, left, right
+
+        }
+    }
+
     /*
     MAIN METHOD
      */
@@ -216,10 +298,14 @@ public class Puzzle {
         System.out.println("Welcome to Anna's Project!");
         System.out.println();
 
-        puzzle.setState("1b2345678");
-        puzzle.printState();
-        puzzle.calculateH1();
-        puzzle.calculateH2();
+        int someState [][]= {{0,1,2}, {3,4,5}, {6,7,8}};
+
+        //puzzle.setState("1b2345678");
+        //puzzle.printCurrentState();
+
+        puzzle.move("down", someState);
+
+        puzzle.printState(someState);
 
         /*
         BufferedReader br = new BufferedReader(
@@ -236,7 +322,7 @@ public class Puzzle {
         //Check for input
         if (args.length > 0) {
             if (args[0].equals( "printState"))
-                puzzle.printState();
+                puzzle.printCurrentState();
             if (args[0].equals("setState"))
                 puzzle.setState(args[1] + args[2] + args[3]);
         }
