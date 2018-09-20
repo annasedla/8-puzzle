@@ -45,7 +45,7 @@ public class Puzzle {
     }
 
     // Print the state of the puzzle
-    public void printState (int [][] state){
+    public String printState (int [][] state){
 
         String print = "";
         System.out.println("The state of the puzzle is:");
@@ -62,6 +62,7 @@ public class Puzzle {
             print = "";
 
         }
+        return print;
     }
 
     // Convert the state array to string
@@ -110,6 +111,11 @@ public class Puzzle {
                 }
             }
         }
+    }
+
+    //gets the current state of the puzzle
+    public int[][] getState(){
+        return currentState;
     }
 
     // Move the blank piece around
@@ -212,14 +218,14 @@ public class Puzzle {
      */
 
     //calculating h1 heuristic (misplaced tiles)
-    public int calculateH1(){
+    public int calculateH1(int[][] state){
 
         int misplacedTiles = 0;
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (currentState[i][j] != goalState[i][j])
-                    if (currentState[i][j] == 0) {
+                if (state[i][j] != goalState[i][j])
+                    if (state[i][j] == 0) {
                         //do nothing since blank is not a tile
                     } else {
                         misplacedTiles++;
@@ -232,7 +238,7 @@ public class Puzzle {
     }
 
     //calculating h2 heuristic (manhattan distances)
-    public int calculateH2(){
+    public int calculateH2(int[][] state){
 
         //manhatttan distance between all the tiles
         int distance = 0;
@@ -243,7 +249,7 @@ public class Puzzle {
         for (int k = 0; k < 9; k++){
             for (int i = 0; i < 3; i++){
                 for (int j = 0; j < 3; j++){
-                    if (currentState[i][j] == k && k != 0){
+                    if (state[i][j] == k && k != 0){
 
                         distance += Math.abs(i - b);
                         distance += Math.abs(j - a);
@@ -253,7 +259,7 @@ public class Puzzle {
                         } else {
                             a ++;
                         }
-                    } else if (currentState[i][j] == k && k == 0){
+                    } else if (state[i][j] == k && k == 0){
                         if (a > 1) {
                             a = 0;
                             b ++;
@@ -269,17 +275,31 @@ public class Puzzle {
     }
 
     //Helper class for node
-    private class Node{
+    private class Node implements Comparable<Node>{
         private int [][] state;
         private Node previous;
         private String move;
         private int pathCost;
+        private int heuristics;
 
         private Node(int [][] state, Node previous, String move, int pathCost){
-            this.state = state;
+            this.state = stateClone(state);
             this.previous = previous;
             this.move = move;
             this.pathCost = pathCost;
+        }
+
+        @Override
+        public int compareTo(Node node) {
+            return this.pathCost < node.pathCost ? 1 : -1;
+        }
+
+        private int[][] stateClone(int[][] state){
+            int[][] newState = new int [3][3];
+            for(int i = 0; i < 3; i++){
+                newState[i] = state[i].clone();
+            }
+            return newState;
         }
     }
 
@@ -294,43 +314,57 @@ public class Puzzle {
     //repeat until goal state
     public void aStar(){
 
-        //stores number of moves in the algorithm
-        int numberOfMoves = 0;
-
         //create a parent node from the current state
         Node parent =  new Node (currentState, null, "", 0);
+        Node current;
 
         //add current state onto priority queue
         priorityQueue.add(parent);
 
-        while (currentState != goalState){
+        while (!toString(currentState).equals(toString(goalState))){
 
             //pop the queue
-            Node current = priorityQueue.poll();
+            current = priorityQueue.poll();
 
+            System.out.println("Current move:" + current.move);
             //Change current state to reflect the node pulled off the queue
+
             setState(toString(current.state));
+            printState(current.state);
 
             //explore left, right, up, down
+            System.out.println();
+            System.out.println("Left?");
             Node left = new Node(move("left", current.state), current,
-                    "left", calculateH1()+calculateH2()+1);
+                    "left", current.pathCost + 1);
+            left.heuristics = calculateH1(left.state) + calculateH2(left.state);
+            System.out.println();
+
+            System.out.println();
+            System.out.println("Right?");
             Node right = new Node(move("right", current.state), current,
-                    "right", calculateH1()+calculateH2()+1);
+                    "up", current.pathCost + 1);
+            right.heuristics = calculateH1(right.state) + calculateH2(right.state);
+            System.out.println();
+
+            System.out.println();
+            System.out.println("Up?");
             Node up = new Node(move("up", current.state), current,
-                    "right", calculateH1()+calculateH2()+1);
+                    "up", current.pathCost + 1);
+            up.heuristics = calculateH1(up.state) + calculateH2(up.state);
+
+            System.out.println();
+            System.out.println("Down?");
             Node down = new Node(move("down", current.state), current,
-                    "right", calculateH1()+calculateH2()+1);
+                    "down", current.pathCost + 1);
+            down.heuristics = calculateH1(down.state) + calculateH2(down.state);
 
             //push on the queue
+            //priorityQueue.add(left);
+            //priorityQueue.add(right);
             priorityQueue.add(left);
-            priorityQueue.add(right);
-            priorityQueue.add(up);
-            priorityQueue.add(down);
-
-            //increase the number of moves
-            numberOfMoves++;
+            //priorityQueue.add(down);
         }
-        printCurrentState();
     }
 
     /*
@@ -342,14 +376,10 @@ public class Puzzle {
         System.out.println("Welcome to Anna's Project!");
         System.out.println();
 
-        int someState [][]= {{0,1,2}, {3,4,5}, {6,7,8}};
-
-        //puzzle.setState("1b2345678");
-        //puzzle.printCurrentState();
-
-        puzzle.move("down", someState);
-
-        puzzle.printState(someState);
+        puzzle.move("right", puzzle.getState());
+        puzzle.move("right", puzzle.getState());
+        puzzle.printCurrentState();
+        puzzle.aStar();
 
         /*
         BufferedReader br = new BufferedReader(
@@ -361,7 +391,7 @@ public class Puzzle {
             }
         } finally {
             br.close();
-        }*/
+        }
 
         //Check for input
         if (args.length > 0) {
@@ -371,6 +401,6 @@ public class Puzzle {
                 puzzle.setState(args[1] + args[2] + args[3]);
         }
         else
-            System.out.println("No command line arguments found, check your inputs.");
+            System.out.println("No command line arguments found, check your inputs.");*/
     }
 }
