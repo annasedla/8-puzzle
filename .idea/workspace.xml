@@ -18,13 +18,14 @@
     <session id="-2051463993">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="5" />
+          <entry key="project.closed" value="6" />
           <entry key="project.open.time.0" value="1" />
           <entry key="project.open.time.1" value="2" />
+          <entry key="project.open.time.6" value="1" />
           <entry key="project.open.time.7" value="1" />
           <entry key="project.open.time.8" value="1" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="6" />
+          <entry key="project.opened" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -43,16 +44,16 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="9589" />
+          <entry key="java" value="11130" />
           <entry key="main" value="11" />
-          <entry key="txt" value="529" />
+          <entry key="txt" value="681" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="CLASS" value="11" />
-          <entry key="JAVA" value="9589" />
-          <entry key="PLAIN_TEXT" value="529" />
+          <entry key="JAVA" value="11130" />
+          <entry key="PLAIN_TEXT" value="681" />
         </counts>
       </usages-collector>
     </session>
@@ -62,13 +63,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Puzzle.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1158">
-              <caret line="389" column="25" selection-start-line="389" selection-start-column="25" selection-end-line="389" selection-end-column="25" />
-              <folding>
-                <element signature="e#407#413#0" expanded="true" />
-                <element signature="e#2728#2729#0" expanded="true" />
-                <element signature="e#2745#2746#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="256">
+              <caret line="416" column="21" lean-forward="true" selection-start-line="416" selection-start-column="21" selection-end-line="416" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -242,27 +238,42 @@
       <option name="project" value="LOCAL" />
       <updated>1537416285670</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="It actually works now but only if random is &lt;4.">
+      <created>1537417990197</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1537417990197</updated>
+    </task>
+    <task id="LOCAL-00013" summary="It works! Its alive! (Fixed the Node private class and the 2nd heuristic.)">
+      <created>1537461382478</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1537461382478</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26752505" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27110156" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="UI Designer" order="3" />
       <window_info id="Favorites" order="4" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32891566" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.47639486" visible="true" weight="0.30963856" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49570817" weight="0.4" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49499285" visible="true" weight="0.4361446" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49499285" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.48783976" weight="0.18915662" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.52360517" side_tool="true" visible="true" weight="0.30963856" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.48640916" weight="0.6204819" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50500715" side_tool="true" visible="true" weight="0.4361446" />
       <window_info anchor="bottom" id="Messages" order="10" sideWeight="0.49499285" weight="0.32891566" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -287,20 +298,17 @@
     <MESSAGE value="Changed move method and shit still works." />
     <MESSAGE value="Added toString methods and made progress on A star" />
     <MESSAGE value="Still broken but less than before." />
-    <option name="LAST_COMMIT_MESSAGE" value="Still broken but less than before." />
+    <MESSAGE value="It actually works now but only if random is &lt;4." />
+    <MESSAGE value="It works! Its alive! (Fixed the Node private class and the 2nd heuristic.)" />
+    <option name="LAST_COMMIT_MESSAGE" value="It works! Its alive! (Fixed the Node private class and the 2nd heuristic.)" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/Main" />
     <entry file="file://$PROJECT_DIR$/src/EightPuzzle" />
     <entry file="file://$PROJECT_DIR$/src/Puzzle.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1158">
-          <caret line="389" column="25" selection-start-line="389" selection-start-column="25" selection-end-line="389" selection-end-column="25" />
-          <folding>
-            <element signature="e#407#413#0" expanded="true" />
-            <element signature="e#2728#2729#0" expanded="true" />
-            <element signature="e#2745#2746#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="256">
+          <caret line="416" column="21" lean-forward="true" selection-start-line="416" selection-start-column="21" selection-end-line="416" selection-end-column="21" />
         </state>
       </provider>
     </entry>
