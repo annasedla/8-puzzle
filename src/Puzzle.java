@@ -16,6 +16,11 @@ public class Puzzle {
     private int currentBlank [] = new int [2];
 
     /*
+    PRIORITY QUEUE
+     */
+    private PriorityQueue<Node> priorityQueue = new PriorityQueue<Node>();
+
+    /*
     HELPER METHODS
      */
 
@@ -57,6 +62,22 @@ public class Puzzle {
             print = "";
 
         }
+    }
+
+    // Convert the state array to string
+    public String toString(int [][] state){
+        String result = "";
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (state[i][j] == 0){
+                    result += "b";
+                } else {
+                    result += Integer.toString(state[i][j]);
+                }
+            }
+            result += " ";
+        }
+        return result;
     }
 
     // Set the state of the puzzle
@@ -187,7 +208,7 @@ public class Puzzle {
     }
 
     /*
-    SEARCH
+    MORE HELPER METHODS
      */
 
     //calculating h1 heuristic (misplaced tiles)
@@ -263,9 +284,8 @@ public class Puzzle {
     }
 
     /*
-    PRIORITY QUEUE
+    A STAR
      */
-    private PriorityQueue<Node> priorityQueue = new PriorityQueue<Node>();
 
     //using A * to solve the puzzle
     //add current state onto priority queue
@@ -284,9 +304,33 @@ public class Puzzle {
         priorityQueue.add(parent);
 
         while (currentState != goalState){
-            //search through the states by moving the tile up, down, left, right
 
+            //pop the queue
+            Node current = priorityQueue.poll();
+
+            //Change current state to reflect the node pulled off the queue
+            setState(toString(current.state));
+
+            //explore left, right, up, down
+            Node left = new Node(move("left", current.state), current,
+                    "left", calculateH1()+calculateH2()+1);
+            Node right = new Node(move("right", current.state), current,
+                    "right", calculateH1()+calculateH2()+1);
+            Node up = new Node(move("up", current.state), current,
+                    "right", calculateH1()+calculateH2()+1);
+            Node down = new Node(move("down", current.state), current,
+                    "right", calculateH1()+calculateH2()+1);
+
+            //push on the queue
+            priorityQueue.add(left);
+            priorityQueue.add(right);
+            priorityQueue.add(up);
+            priorityQueue.add(down);
+
+            //increase the number of moves
+            numberOfMoves++;
         }
+        printCurrentState();
     }
 
     /*
