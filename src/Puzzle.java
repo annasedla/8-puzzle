@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 public class Puzzle {
 
@@ -303,9 +304,12 @@ public class Puzzle {
         //create a parent node from the current state
         Node parent =  new Node (currentState, null, "", 0);
         Node current;
+        Node stackNode;
+        Node printNode;
 
-        //clear priority queue
+        //clear priority queue and stack
         priorityQueue.clear();
+        stack.empty();
 
         //add current state onto priority queue
         priorityQueue.add(parent);
@@ -369,13 +373,25 @@ public class Puzzle {
 
                 //calculates the number of nodes
                 System.out.println("Number of moves:" + current.pathCost);
+                System.out.println("Number of total loops: " + (iterations-1));
+                System.out.println();
 
-                //run a function here to backtrace all the nodes using a stack
+                stackNode = current;
 
+                //backtrace all the nodes using a stack
+                while(stackNode.previous != null){
+                    stack.add(stackNode);
+                    stackNode = stackNode.previous;
+                }
+
+                while(!stack.isEmpty()){
+                    printNode = stack.pop();
+                    System.out.println(printNode.move);
+                    printState(printNode.state);
+                    System.out.println();
+                }
             }
         }
-
-        System.out.println("Number of total loops: " + (iterations-1));
     }
 
     /*
@@ -455,7 +471,7 @@ public class Puzzle {
     /*
     MAIN METHOD
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException, IOException{
 
         Puzzle puzzle = new Puzzle();
         System.out.println("Welcome to Anna's Project!");
@@ -463,42 +479,28 @@ public class Puzzle {
 
         puzzle.setState("461 873 b52");
         System.out.println("ASTAR with H1");
-        puzzle.aStar("h1");
-        puzzle.printState();
-        System.out.println();
 
-        puzzle.setState("461 873 b52");
-        System.out.println("ASTAR with H2");
-        puzzle.aStar("h2");
-        puzzle.printState();
-        System.out.println();
+//        puzzle.aStar("h1");
+//        puzzle.printState();
+//        System.out.println();
 
-        puzzle.setState("461 873 b52");
-        System.out.println("LOCAL BEAM");
-        puzzle.localBeamSearch(20);
-        puzzle.printState();
-        System.out.println();
+//        Scanner in = new Scanner(new BufferedReader(new InputStreamReader(System.in)));
+//        String s = in.next();
+//        System.out.println(s);
 
-        /*
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(new FileInputStream(fileName)));
-        try {
-            String line;
-            while ((line = br.readLine()) != null) {
-                // process line
-            }
-        } finally {
-            br.close();
+        try
+        {
+            FileInputStream textFile = new FileInputStream ("test.txt");
+            System.out.println("File test.txt has been opened.");
+
+            Scanner inFile = new Scanner (textFile);
+            String oneLine = inFile.nextLine();
+            System.out.println(oneLine);
         }
 
-        //Check for input
-        if (args.length > 0) {
-            if (args[0].equals( "pri ntState"))
-                puzzle.printCurrentState();
-            if (args[0].equals("setState"))
-                puzzle.setState(args[1] + args[2] + args[3]);
+        catch (FileNotFoundException fnfe)
+        {
+            System.out.println("File data.txt was not found!");
         }
-        else
-            System.out.println("No command line arguments found, check your inputs.");*/
     }
 }
