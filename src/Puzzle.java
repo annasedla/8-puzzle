@@ -15,8 +15,8 @@ public class Puzzle {
 
     //position of blank
     private int currentBlank [] = new int [2];
-
-    private int maxNodes;
+    private int maxNodes = 10000000;
+    private int seed = 123456789;
 
     /*
     HELPER METHODS
@@ -49,7 +49,7 @@ public class Puzzle {
     }
 
     // Convert the state array to string
-    public String toString(int [][] state){
+    private String toString(int [][] state){
         String result = "";
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -119,7 +119,7 @@ public class Puzzle {
                 }
             }
         }
-        if (direction == "up" && blank[0] != 0){
+        if (direction.equals("up") && blank[0] != 0){
             //swap the tiles
             int x = state[blank[0]-1][blank[1]];
             state[blank[0]-1][blank[1]] = 0;
@@ -130,7 +130,7 @@ public class Puzzle {
 
             return state;
 
-        } else if (direction == "down" && blank[0] != 2 ){
+        } else if (direction.equals("down") && blank[0] != 2 ){
             //swap the tiles
             int x = state[blank[0]+1][blank[1]];
             state[blank[0]+1][blank[1]] = 0;
@@ -141,7 +141,7 @@ public class Puzzle {
 
             return state;
 
-        } else if (direction == "left" && blank[1] != 0){
+        } else if (direction.equals("left") && blank[1] != 0){
             //swap the tiles
             int x = state[blank[0]][blank[1]-1];
             state[blank[0]][blank[1] - 1] = 0;
@@ -152,7 +152,7 @@ public class Puzzle {
 
             return state;
 
-        } else if (direction =="right" && blank[1] != 2){
+        } else if (direction.equals("right") && blank[1] != 2){
             //swap the tiles
             int x = state[blank[0]][blank[1]+1];
             state[blank[0]][blank[1] + 1] = 0;
@@ -164,8 +164,6 @@ public class Puzzle {
             return state;
 
         } else {
-
-            //return the same without changing it??
             return state;
         }
     }
@@ -175,42 +173,36 @@ public class Puzzle {
 
         //first set to goal state
         setState("b12345678");
-        Random rand = new Random();
+        Random rand = new Random(seed);
 
         //randomize the state of the puzzle
         for (int i = 0; i < n; i++){
             //create a new random variable at each iteration
             int number = rand.nextInt(4) + 1;
-            //System.out.println("Random number at this iteration: " + number);
 
             if (number == 1){
-                //System.out.println("Moving blank tile up.");
                 move("up");
             } else if (number == 2){
                 move("down");
-                //System.out.println("Moving blank tile down.");
             } else if (number == 3){
                 move ("left");
-                //System.out.println("Moving blank tile left.");
             } else if (number == 4){
                 move ("right");
-                //System.out.println("Moving blank tile right.");
             }
         }
     }
 
     //calculating h1 heuristic (misplaced tiles)
-    public int calculateH1(int[][] state){
+    private int calculateH1(int[][] state){
 
         int misplacedTiles = 0;
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (state[i][j] != goalState[i][j])
-                    if (state[i][j] == 0) {
-                        //do nothing since blank is not a tile
-                    } else {
+                if (state[i][j] != goalState[i][j]){
+                    if (state[i][j] != 0) {
                         misplacedTiles++;
+                    }
                 }
             }
         }
@@ -295,7 +287,7 @@ public class Puzzle {
     A STAR
      */
 
-    public void aStar(String s){
+    public void solveAStar(String s){
 
         //priority queue
         PriorityQueue<Node> priorityQueue = new PriorityQueue<Node>();
@@ -316,8 +308,13 @@ public class Puzzle {
 
         //how long it takes the algorithm to solve the puzzle
         int iterations = 0;
+        int nodeCount = 0;
 
        while (!toString(currentState).equals(toString(goalState))){
+
+            if (nodeCount > maxNodes)
+                //throw an exception and terminate the method
+                throw new IndexOutOfBoundsException();
 
             //pop the queue
             current = priorityQueue.poll();
@@ -359,14 +356,25 @@ public class Puzzle {
            }
 
             //push on the queue
-            if (!toString(current.state).equals(toString(left.state)))
+            if (!toString(current.state).equals(toString(left.state))){
                 priorityQueue.add(left);
-            if (!toString(current.state).equals(toString(right.state)))
-            priorityQueue.add(right);
-            if (!toString(current.state).equals(toString(up.state)))
+                nodeCount++;
+            }
+
+            if (!toString(current.state).equals(toString(right.state))){
+                priorityQueue.add(right);
+                nodeCount++;
+            }
+
+            if (!toString(current.state).equals(toString(up.state))){
                 priorityQueue.add(up);
-            if (!toString(current.state).equals(toString(down.state)))
+                nodeCount++;
+            }
+
+            if (!toString(current.state).equals(toString(down.state))){
                 priorityQueue.add(down);
+                nodeCount++;
+            }
 
             //goes through during last iteration
             if (toString(current.state).equals(toString(goalState))){
@@ -398,7 +406,10 @@ public class Puzzle {
     LOCAL BEAM SEARCH
      */
 
-    public void localBeamSearch(int k){
+    //change evaluation function to h1 + h2
+    //compare states so they dont repeat
+
+    public void solveBeamSearch(int k){
 
         // Priority queues
         PriorityQueue<Node> priorityQueue = new PriorityQueue<Node>();
@@ -477,25 +488,38 @@ public class Puzzle {
         System.out.println("Welcome to Anna's Project!");
         System.out.println();
 
-        puzzle.setState("461 873 b52");
-        System.out.println("ASTAR with H1");
-
-//        puzzle.aStar("h1");
-//        puzzle.printState();
-//        System.out.println();
-
-//        Scanner in = new Scanner(new BufferedReader(new InputStreamReader(System.in)));
-//        String s = in.next();
-//        System.out.println(s);
-
         try
         {
             FileInputStream textFile = new FileInputStream ("test.txt");
             System.out.println("File test.txt has been opened.");
 
             Scanner inFile = new Scanner (textFile);
-            String oneLine = inFile.nextLine();
-            System.out.println(oneLine);
+
+            while(inFile.hasNextLine())
+            {
+                String oneline = inFile.nextLine();
+                System.out.println(oneline);
+                String[] items = oneline.split(" ");
+
+                if (items[0].equals("printState")){
+                    puzzle.printState();
+                } else if (items[0].equals("setState")){
+                    puzzle.setState(items[1] + " " + items[2] + " " + items[3]);
+                } else if (items[0].equals("randomizeState")){
+                    puzzle.randomizeState(20);
+                } else if (items[0].equals("move")){
+                    puzzle.move(items[1]);
+                } else if (items[0].equals("maxNodes")) {
+                    puzzle.maxNodes(Integer.parseInt(items[1]));
+                } else if (items[0].equals("solve") && items[1].equals("beam")) {
+                    puzzle.solveBeamSearch(Integer.parseInt(items[2]));
+                } else if (items[0].equals("solve") && items[1].equals("A-Star")) {
+                    if (items[2].equals("h1"))
+                        puzzle.solveAStar("h1");
+                    else
+                        puzzle.solveAStar("h2");
+                }
+            }
         }
 
         catch (FileNotFoundException fnfe)
