@@ -36,7 +36,7 @@ public class Puzzle {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (state[i][j] == 0)
-                    print += "b";
+                    print += " ";
                 else
                     print += state [i][j];
                 print += " ";
@@ -289,12 +289,12 @@ public class Puzzle {
 
     public void solveAStar(String s){
 
-        //priority queue
+        //priority queue and stack to output moves at the end
         PriorityQueue<Node> priorityQueue = new PriorityQueue<Node>();
         Stack<Node> stack = new Stack<>();
 
         //create a parent node from the current state
-        Node parent =  new Node (currentState, null, "", 0);
+        Node parent =  new Node (currentState, null, "start", 0);
         Node current;
         Node stackNode;
         Node printNode;
@@ -380,7 +380,7 @@ public class Puzzle {
             if (toString(current.state).equals(toString(goalState))){
 
                 //calculates the number of nodes
-                System.out.println("Number of moves:" + current.pathCost);
+                System.out.println("Solution length: " + current.pathCost);
                 System.out.println("Number of total loops: " + (iterations-1));
                 System.out.println();
 
@@ -391,6 +391,8 @@ public class Puzzle {
                     stack.add(stackNode);
                     stackNode = stackNode.previous;
                 }
+
+                stack.add(stackNode);
 
                 while(!stack.isEmpty()){
                     printNode = stack.pop();
@@ -411,16 +413,22 @@ public class Puzzle {
 
     public void solveBeamSearch(int k){
 
-        // Priority queues
+        // Priority queues and stack to output moves at the end
         PriorityQueue<Node> priorityQueue = new PriorityQueue<Node>();
         PriorityQueue<Node> priorityQueue2 = new PriorityQueue<>();
+        Stack<Node> stack = new Stack<>();
+
+        HashMap<String, Node> map = new HashMap<>();
 
         //create a parent node from the current state
-        Node parent =  new Node (currentState, null, "", 0);
+        Node parent =  new Node (currentState, null, "start", 0);
         Node current;
+        Node stackNode;
+        Node printNode;
 
-        //clear priority queue
+        //clear priority queue and stack
         priorityQueue.clear();
+        stack.empty();
 
         //add current state onto priority queue
         priorityQueue.add(parent);
@@ -437,27 +445,39 @@ public class Puzzle {
             setState(toString(current.state));
 
             //explore left, right, up, down
-            Node left = new Node(current.state, current, "left", current.pathCost + 1);
-            left.heuristics = calculateH2(left.state);
+            Node left = new Node(current.state, current, "left", 0);
+            left.heuristics = calculateH2(left.state) + calculateH1(left.state);
 
-            Node right = new Node(current.state, current, "right", current.pathCost + 1);
-            right.heuristics = calculateH2(right.state);
+            Node right = new Node(current.state, current, "right", 0);
+            right.heuristics = calculateH2(right.state) + calculateH1(right.state);
 
-            Node up = new Node(current.state, current, "up", current.pathCost + 1);
-            up.heuristics = calculateH2(up.state);
+            Node up = new Node(current.state, current, "up", 0);
+            up.heuristics = calculateH2(up.state) + calculateH1(up.state);
 
-            Node down = new Node(current.state, current, "down", current.pathCost + 1);
-            down.heuristics = calculateH2(down.state);
+            Node down = new Node(current.state, current, "down", 0);
+            down.heuristics = calculateH2(down.state) + calculateH1(down.state);
 
             //push on the queue
-            if (!toString(current.state).equals(toString(left.state)))
+            if (!toString(current.state).equals(toString(left.state)) && map.get(toString(left.state)) == null){
                 priorityQueue.add(left);
-            if (!toString(current.state).equals(toString(right.state)))
+                map.put(toString(left.state), left);
+            }
+
+
+            if (!toString(current.state).equals(toString(right.state)) && map.get(toString(right.state)) == null){
                 priorityQueue.add(right);
-            if (!toString(current.state).equals(toString(up.state)))
+                map.put(toString(right.state), right);
+            }
+
+            if (!toString(current.state).equals(toString(up.state)) && map.get(toString(up.state)) == null){
                 priorityQueue.add(up);
-            if (!toString(current.state).equals(toString(down.state)))
+                map.put(toString(up.state), up);
+            }
+
+            if (!toString(current.state).equals(toString(down.state)) && map.get(toString(down.state)) == null){
                 priorityQueue.add(down);
+                map.put(toString(down.state), down);
+            }
 
             // Wipe the queue if over k nodes in it
             if  (priorityQueue.size() > k){
@@ -470,13 +490,34 @@ public class Puzzle {
                 priorityQueue2.clear();
             }
 
+            //goes through during last iteration
             if (toString(current.state).equals(toString(goalState))){
-                System.out.println("Number of moves:" + current.pathCost);
-                //run a function here to backtrace all the nodes like stack
+
+                stackNode = current;
+                int path = 0;
+
+                //backtrace all the nodes using a stack
+                while(stackNode.previous != null){
+                    stack.add(stackNode);
+                    stackNode = stackNode.previous;
+                    path++;
+                }
+
+                stack.add(stackNode);
+
+                //calculates the number of nodes
+                System.out.println("Solution length: " + path);
+                System.out.println("Number of total loops: " + (iterations-1));
+                System.out.println();
+
+                while(!stack.isEmpty()){
+                    printNode = stack.pop();
+                    System.out.println(printNode.move);
+                    printState(printNode.state);
+                    System.out.println();
+                }
             }
         }
-
-        System.out.println("Number of total loops: " + (iterations-1));
     }
 
     /*
@@ -506,14 +547,14 @@ public class Puzzle {
                 } else if (items[0].equals("setState")){
                     puzzle.setState(items[1] + " " + items[2] + " " + items[3]);
                 } else if (items[0].equals("randomizeState")){
-                    puzzle.randomizeState(20);
+                    puzzle.randomizeState(Integer.parseInt(items[1]));
                 } else if (items[0].equals("move")){
                     puzzle.move(items[1]);
                 } else if (items[0].equals("maxNodes")) {
                     puzzle.maxNodes(Integer.parseInt(items[1]));
                 } else if (items[0].equals("solve") && items[1].equals("beam")) {
                     puzzle.solveBeamSearch(Integer.parseInt(items[2]));
-                } else if (items[0].equals("solve") && items[1].equals("A-Star")) {
+                } else if (items[0].equals("solve") && items[1].equals("A-star")) {
                     if (items[2].equals("h1"))
                         puzzle.solveAStar("h1");
                     else
